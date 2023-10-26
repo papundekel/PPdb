@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "rootDir": "src/",
+        "outDir": "dist/",
+        "declaration": true,
+        "paths": {
+            "@api/*": [
+                "./node_modules/ppdb-frontend-api/dist/*"
+            ],
+            "@modules/*": [
+                "./node_modules/*"
+            ],
+            "@this/*": [
+                "./src/*"
+            ]
+        },
+    }
+}

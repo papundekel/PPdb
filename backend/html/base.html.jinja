@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <script type="importmap">
+    {
+        "imports": {
+            "jquery": "https://esm.sh/jquery@3.7.1",
+            "datatables.net": "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.mjs"
+        }
+    }
+    </script>
+
+    {% block body %}{% endblock %}
+</body>
+
+</html>
