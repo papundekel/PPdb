@@ -2,3 +2,8 @@ __pycache__/
 .venv/
 .vscode/
 database.db
+
+node_modules/
+backend/static/
+dist/
+tmp/
