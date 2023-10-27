@@ -1,4 +1,2 @@
-*
-!.gitignore
-!package.json
-!tsconfig.json
+src/*
+!src/utils/
