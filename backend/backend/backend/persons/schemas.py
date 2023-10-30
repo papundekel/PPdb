@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlmodel import SQLModel
 
-from backend.models.person import PersonBase
+from backend.persons.models import PersonBase
 
 
 class PersonCreate(PersonBase):

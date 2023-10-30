@@ -3,3 +3,6 @@ sqlmodel
 alembic
 aiosqlite
 jinja2
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]

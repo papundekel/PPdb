@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from backend.routers.api import persons
+import backend.persons.routers.api as persons
 
 router = APIRouter(prefix="/api")
 router.include_router(persons.router)
