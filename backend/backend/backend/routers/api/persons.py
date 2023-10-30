@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -11,7 +13,7 @@ router = APIRouter(tags=["persons"], prefix="/persons")
 
 
 @router.get("/", response_model=list[PersonRead])
-async def __get_persons(*, session: AsyncSession = Depends(get_session)):
+async def __get_persons(*, session: Annotated[AsyncSession, Depends(get_session)]):
     query = select(PersonDB)
     result = await session.exec(query)  # type: ignore
     persons = list(result)
@@ -20,21 +22,26 @@ async def __get_persons(*, session: AsyncSession = Depends(get_session)):
 
 @router.post("/", response_model=PersonRead)
 async def __create_person(
-    *, session: AsyncSession = Depends(get_session), person: PersonCreate
+    *, session: Annotated[AsyncSession, Depends(get_session)], person: PersonCreate
 ):
     person_db = PersonDB.from_orm(person)
 
     return await add_commit_refresh(session, person_db)
 
 
-@router.get("/{id}/", response_model=PersonRead)
-async def __get_person(*, session: AsyncSession = Depends(get_session), id: int):
+@router.get("/{id}", response_model=PersonRead)
+async def __get_person(
+    *, session: Annotated[AsyncSession, Depends(get_session)], id: int
+):
     return await get_or_404(session, PersonDB, id)
 
 
-@router.patch("/{id}/", response_model=PersonRead)
+@router.patch("/{id}", response_model=PersonRead)
 async def __update_person(
-    *, session: AsyncSession = Depends(get_session), id: int, person: PersonUpdate
+    *,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    id: int,
+    person: PersonUpdate
 ):
     person_db = await get_or_404(session, PersonDB, id)
 
@@ -45,8 +52,10 @@ async def __update_person(
     return await add_commit_refresh(session, person_db)
 
 
-@router.delete("/{id}/")
-async def __delete_person(*, session: AsyncSession = Depends(get_session), id: int):
+@router.delete("/{id}")
+async def __delete_person(
+    *, session: Annotated[AsyncSession, Depends(get_session)], id: int
+):
     person_db = await get_or_404(session, PersonDB, id)
 
     await session.delete(person_db)
