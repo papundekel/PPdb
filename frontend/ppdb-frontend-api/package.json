@@ -4,9 +4,11 @@
     "description": "Frontend library for the PPdb backend API.",
     "devDependencies": {
         "typescript": "5.2.2",
-        "tsc-alias": "1.8.8"
+        "tsc-alias": "1.8.8",
+        "@openapitools/openapi-generator-cli": "2.7.0"
     },
     "scripts": {
+        "generate": "openapi-generator-cli",
         "prepare": "npm run build",
         "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
     },

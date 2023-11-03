@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import EmailStr
@@ -17,6 +18,7 @@ class UserDB(UserBase, table=True):
 class TokenBase(SQLModel):
     token: str = Field(primary_key=True)
     user_id: int = Field(foreign_key="userdb.id")
+    expires: datetime
 
 
 class TokenDB(TokenBase, table=True):
