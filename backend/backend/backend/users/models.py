@@ -23,3 +23,8 @@ class TokenBase(SQLModel):
 
 class TokenDB(TokenBase, table=True):
     user: UserDB = Relationship(back_populates="tokens")
+
+
+class AccessToken(SQLModel):
+    access_token: str
+    token_type: str

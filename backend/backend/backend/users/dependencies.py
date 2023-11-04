@@ -1,4 +1,3 @@
-from sys import stderr
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -8,17 +7,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.database import get_session
 from backend.users import oauth2_scheme
-from backend.users.models import TokenDB
-from backend.utils import select_all_list
+from backend.users.models import TokenDB, UserDB
 
 
 async def get_current_user(
-    *,
     session: Annotated[AsyncSession, Depends(get_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
-    print(f"{token=}", file=stderr)
-    print(await select_all_list(session, TokenDB), file=stderr)
+    if token is None:
+        return None
 
     token_db = (
         await session.exec(
@@ -29,12 +26,15 @@ async def get_current_user(
     ).first()
 
     if token_db is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return None
 
     user = token_db.user
+
+    return user
+
+
+async def require_login(user: Annotated[UserDB, Depends(get_current_user)]):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
     return user

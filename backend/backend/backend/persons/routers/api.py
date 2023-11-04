@@ -6,6 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from backend.database import get_session
 from backend.persons.models import PersonDB
 from backend.persons.schemas import PersonCreate, PersonRead, PersonUpdate
+from backend.users.dependencies import require_login
 from backend.utils import (
     add_commit_refresh,
     delete_commit,
@@ -14,17 +15,22 @@ from backend.utils import (
     update_instance,
 )
 
-router = APIRouter(tags=["persons"], prefix="/persons")
+router = APIRouter(
+    tags=["persons"], prefix="/persons", dependencies=[Depends(require_login)]
+)
 
 
 @router.get("/", response_model=list[PersonRead])
-async def get_all(*, session: Annotated[AsyncSession, Depends(get_session)]):
+async def get_all(
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
     return await select_all_list(session, PersonDB)
 
 
 @router.post("/", response_model=PersonRead)
 async def create(
-    *, session: Annotated[AsyncSession, Depends(get_session)], person: PersonCreate
+    session: Annotated[AsyncSession, Depends(get_session)],
+    person: PersonCreate,
 ):
     person_db = PersonDB.from_orm(person)
 
@@ -32,16 +38,18 @@ async def create(
 
 
 @router.get("/{id}", response_model=PersonRead)
-async def get(*, session: Annotated[AsyncSession, Depends(get_session)], id: int):
+async def get(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    id: int,
+):
     return await get_or_404(session, PersonDB, id)
 
 
 @router.patch("/{id}", response_model=PersonRead)
 async def update(
-    *,
     session: Annotated[AsyncSession, Depends(get_session)],
     id: int,
-    person: PersonUpdate
+    person: PersonUpdate,
 ):
     person_db = await get_or_404(session, PersonDB, id)
 
@@ -51,7 +59,10 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(*, session: Annotated[AsyncSession, Depends(get_session)], id: int):
+async def delete(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    id: int,
+):
     person_db = await get_or_404(session, PersonDB, id)
 
     await delete_commit(session, person_db)

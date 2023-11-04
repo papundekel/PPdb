@@ -1,10 +1,10 @@
-{% extends "base.html.jinja" %}
+{% extends "logged.html.jinja" %}
 
 {% block title %}
 Person Creation
 {% endblock %}
 
-{% block body %}
+{% block body_logged %}
 <form method="post" id="form">
     <div class="mb-3">
         <label for="first_name">First Name</label>
@@ -20,6 +20,8 @@ Person Creation
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+{% endblock %}
 
+{% block scripts_logged %}
 <script type="module" src="/static/js/site/persons/create.js"></script>
 {% endblock %}
