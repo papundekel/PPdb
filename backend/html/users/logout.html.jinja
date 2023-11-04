@@ -1,0 +1,15 @@
+{% extends "logged.html.jinja" %}
+
+{% block title %}
+Logout
+{% endblock %}
+
+{% block body_logged %}
+<form method="post" id="form">
+    <button type="submit" class="btn btn-primary">Logout</button>
+</form>
+{% endblock %}
+
+{% block scripts_logged %}
+<script type="module" src="/static/js/site/users/logout.js"></script>
+{% endblock %}

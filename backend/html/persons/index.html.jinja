@@ -1,10 +1,13 @@
-{% extends "base.html.jinja" %}
+{% extends "logged.html.jinja" %}
 
 {% block title %}
 Persons List
 {% endblock %}
 
-{% block body %}
+{% block body_logged %}
 <table class="table" id="persons-table"></table>
+{% endblock %}
+
+{% block scripts_logged %}
 <script type="module" src="/static/js/site/persons.js"></script>
 {% endblock %}

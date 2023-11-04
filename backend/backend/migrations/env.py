@@ -7,8 +7,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlmodel import SQLModel
 
-from backend.models.person import PersonDB
+from backend.persons.models import PersonDB
 from backend.settings import url
+from backend.users.models import TokenDB, UserDB
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -12,7 +12,7 @@ function handler(event: Event) {
     const person_create = PersonCreateFromJSON(person_create_json);
 
     persons_api
-        .createPersonApiPersonsPost({ personCreate: person_create })
+        .createApiPersonsPost({ personCreate: person_create })
         .then((person) => {
             form.reset();
         });

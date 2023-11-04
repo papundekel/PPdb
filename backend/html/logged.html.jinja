@@ -1,0 +1,13 @@
+{% extends "base.html.jinja" %}
+
+{% block body %}
+<div id="logged-in">Logged in as PLACEHOLDER</div>
+
+{% block body_logged %}{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/users/logged_in.js"></script>
+
+{% block scripts_logged %}{% endblock %}
+{% endblock %}
