@@ -7,6 +7,18 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 T = TypeVar("T", bound=SQLModel)
 
 
+async def get_not_id(
+    session: AsyncSession, ModelDB: type[T], column: Any, pk: Any, *options: Any
+) -> T | None:
+    query = select(ModelDB).where(column == pk)
+
+    if options != ():
+        query = query.options(*options)
+
+    instance_db = (await session.exec(query)).first()
+    return instance_db
+
+
 async def select_all_list(session: AsyncSession, ModelDB: type[T]) -> list[T]:
     query = select(ModelDB)
     result = await session.exec(query)  # type: ignore

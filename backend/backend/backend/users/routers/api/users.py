@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
+from sys import stderr
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,11 +11,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from backend.database import get_session
 from backend.users import oauth2_scheme, pwd_context
 from backend.users.dependencies import require_login
-from backend.users.models import AccessToken, TokenDB, UserDB
+from backend.users.models import AccessToken, RegistrationApprovalDB, TokenDB, UserDB
+from backend.users.routers.api import registration_approval
 from backend.users.schemas import UserCreate, UserRead, UserUpdate
 from backend.utils import (
     add_commit_refresh,
     delete_commit,
+    get_not_id,
     get_or_404,
     select_all_list,
     update_instance,
@@ -23,45 +26,50 @@ from backend.utils import (
 router = APIRouter(tags=["users"], prefix="/users")
 
 
+def make_acess_token(token_db: TokenDB):
+    return AccessToken(access_token=token_db.token, token_type="bearer")
+
+
 @router.post("/login", response_model=AccessToken)
 async def login(
     session: Annotated[AsyncSession, Depends(get_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
 ):
-    if token is None:
-        email = form.username
-        password = form.password
+    if token is not None:
+        token_db = await get_not_id(session, TokenDB, TokenDB.token, token)
 
-        user_db = (
-            await session.exec(select(UserDB).where(UserDB.email == email))
-        ).first()
+        if token_db is not None:
+            return make_acess_token(token_db)
 
-        exception = HTTPException(
-            status_code=401,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    email = form.username
+    password = form.password
 
-        if user_db is None:
-            raise exception
+    user_db = await get_not_id(session, UserDB, UserDB.email, email)
 
-        password_matches = pwd_context.verify(password, user_db.hashed_password)
+    exception = HTTPException(
+        status_code=401,
+        detail="Incorrect username or password",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
-        if not password_matches:
-            raise exception
+    if user_db is None:
+        raise exception
 
-        token_db = TokenDB(
-            token=token_urlsafe(),
-            expires=datetime.now() + timedelta(days=2),
-            user=user_db,
-        )  # type: ignore
+    password_matches = pwd_context.verify(password, user_db.hashed_password)
 
-        await add_commit_refresh(session, token_db)
+    if not password_matches:
+        raise exception
 
-        token = token_db.token
+    token_db = TokenDB(
+        token=token_urlsafe(),
+        expires=datetime.now() + timedelta(days=2),
+        user=user_db,
+    )  # type: ignore
 
-    return AccessToken(access_token=token, token_type="bearer")
+    await add_commit_refresh(session, token_db)
+
+    return make_acess_token(token_db)
 
 
 @router.delete("/login")
@@ -89,10 +97,12 @@ async def current(current_user: Annotated[UserDB, Depends(require_login)]):
     return current_user
 
 
-crud_router = APIRouter(dependencies=[Depends(require_login)])
+crud_router = APIRouter()
 
 
-@crud_router.get("/", response_model=list[UserRead])
+@crud_router.get(
+    "/", response_model=list[UserRead], dependencies=[Depends(require_login)]
+)
 async def get_all(
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
@@ -104,14 +114,27 @@ async def create(
     session: Annotated[AsyncSession, Depends(get_session)],
     user: UserCreate,
 ):
+    approval_db = await get_not_id(
+        session,
+        RegistrationApprovalDB,
+        RegistrationApprovalDB.email,
+        user.email,
+    )
+
+    if approval_db is None:
+        raise HTTPException(status_code=403, detail="User registration not approved.")
+
     user_db = UserDB.from_orm(
         user, {"hashed_password": pwd_context.hash(user.password)}
     )
 
+    await session.delete(approval_db)
     return await add_commit_refresh(session, user_db)
 
 
-@crud_router.get("/{id}", response_model=UserRead)
+@crud_router.get(
+    "/{id}", response_model=UserRead, dependencies=[Depends(require_login)]
+)
 async def get(
     session: Annotated[AsyncSession, Depends(get_session)],
     id: int,
@@ -119,7 +142,9 @@ async def get(
     return await get_or_404(session, UserDB, id)
 
 
-@crud_router.patch("/{id}", response_model=UserRead)
+@crud_router.patch(
+    "/{id}", response_model=UserRead, dependencies=[Depends(require_login)]
+)
 async def update(
     session: Annotated[AsyncSession, Depends(get_session)],
     id: int,
@@ -132,7 +157,7 @@ async def update(
     return await add_commit_refresh(session, user_db)
 
 
-@crud_router.delete("/{id}")
+@crud_router.delete("/{id}", dependencies=[Depends(require_login)])
 async def delete(
     session: Annotated[AsyncSession, Depends(get_session)],
     id: int,
@@ -145,3 +170,4 @@ async def delete(
 
 
 router.include_router(crud_router)
+router.include_router(registration_approval.router)

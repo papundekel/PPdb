@@ -2,12 +2,12 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import joinedload
-from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.database import get_session
 from backend.users import oauth2_scheme
 from backend.users.models import TokenDB, UserDB
+from backend.utils import get_not_id
 
 
 async def get_current_user(
@@ -17,13 +17,9 @@ async def get_current_user(
     if token is None:
         return None
 
-    token_db = (
-        await session.exec(
-            select(TokenDB)
-            .where(TokenDB.token == token)
-            .options(joinedload(TokenDB.user))
-        )
-    ).first()
+    token_db = await get_not_id(
+        session, TokenDB, TokenDB.token, token, joinedload(TokenDB.user)
+    )
 
     if token_db is None:
         return None
