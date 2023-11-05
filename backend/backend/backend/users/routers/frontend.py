@@ -13,3 +13,13 @@ async def login(request: Request):
 @router.get("/logout")
 async def logout(request: Request):
     return TemplateResponse(request, "users/logout")
+
+
+@router.get("/register")
+async def register(request: Request):
+    return TemplateResponse(request, "users/register")
+
+
+@router.get("/approve-registration")
+async def approve_registration(request: Request):
+    return TemplateResponse(request, "users/approve_registration")

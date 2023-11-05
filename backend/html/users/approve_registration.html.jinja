@@ -1,0 +1,19 @@
+{% extends "logged.html.jinja" %}
+
+{% block title %}
+Approve Registration
+{% endblock %}
+
+{% block body_logged %}
+<form method="post" id="form">
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <input type="email" required id="email" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Approve Registration</button>
+</form>
+{% endblock %}
+
+{% block scripts_logged %}
+<script type="module" src="/static/js/site/users/approve_registration.js"></script>
+{% endblock %}

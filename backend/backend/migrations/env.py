@@ -9,7 +9,7 @@ from sqlmodel import SQLModel
 
 from backend.persons.models import PersonDB
 from backend.settings import url
-from backend.users.models import TokenDB, UserDB
+from backend.users.models import RegistrationApprovalDB, TokenDB, UserDB
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

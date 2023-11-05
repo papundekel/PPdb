@@ -28,3 +28,11 @@ class TokenDB(TokenBase, table=True):
 class AccessToken(SQLModel):
     access_token: str
     token_type: str
+
+
+class RegistrationApproval(SQLModel):
+    email: EmailStr = Field(primary_key=True)
+
+
+class RegistrationApprovalDB(RegistrationApproval, table=True):
+    pass
