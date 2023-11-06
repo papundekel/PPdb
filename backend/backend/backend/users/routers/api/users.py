@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
-from sys import stderr
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from starlette.status import HTTP_403_FORBIDDEN
 
 from backend.database import get_session
 from backend.users import oauth2_scheme, pwd_context
@@ -48,9 +48,7 @@ async def login(
     user_db = await get_not_id(session, UserDB, UserDB.email, email)
 
     exception = HTTPException(
-        status_code=401,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Bearer"},
+        status_code=HTTP_403_FORBIDDEN, detail="Incorrect email or password."
     )
 
     if user_db is None:
@@ -122,7 +120,9 @@ async def create(
     )
 
     if approval_db is None:
-        raise HTTPException(status_code=403, detail="User registration not approved.")
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="User registration not approved."
+        )
 
     user_db = UserDB.from_orm(
         user, {"hashed_password": pwd_context.hash(user.password)}
