@@ -1,8 +1,11 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from backend.profiles.models import ProfileAccessDB
 
 
 class UserBase(SQLModel):
@@ -12,7 +15,9 @@ class UserBase(SQLModel):
 class UserDB(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
+
     tokens: List["TokenDB"] = Relationship(back_populates="user")
+    profile_accesses: List["ProfileAccessDB"] = Relationship(back_populates="user")
 
 
 class TokenBase(SQLModel):
