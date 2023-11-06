@@ -3,6 +3,7 @@ from typing import Any, TypeVar
 from fastapi import HTTPException
 from sqlmodel import SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from starlette.status import HTTP_404_NOT_FOUND
 
 T = TypeVar("T", bound=SQLModel)
 
@@ -29,7 +30,7 @@ async def get_or_404(session: AsyncSession, ModelDB: Any, pk: Any):
     instance_db = await session.get(ModelDB, pk)
 
     if instance_db is None:
-        raise HTTPException(status_code=404, detail="Object not found")
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Object not found.")
 
     return instance_db
 

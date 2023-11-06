@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import joinedload
 from sqlmodel.ext.asyncio.session import AsyncSession
+from starlette.status import HTTP_401_UNAUTHORIZED
 
 from backend.database import get_session
 from backend.users import oauth2_scheme
@@ -31,6 +32,8 @@ async def get_current_user(
 
 async def require_login(user: Annotated[UserDB, Depends(get_current_user)]):
     if user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="Not authenticated."
+        )
 
     return user
