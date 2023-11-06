@@ -41,7 +41,7 @@ def upgrade() -> None:
         ),
         sa.ForeignKeyConstraint(
             ["user_id"],
-            ["profiledb.id"],
+            ["userdb.id"],
         ),
         sa.PrimaryKeyConstraint("profile_id", "user_id"),
     )

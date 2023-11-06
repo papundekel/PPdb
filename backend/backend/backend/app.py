@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 import backend.api as api
 import backend.persons.routers.frontend as persons
+import backend.profiles.models
 import backend.users.routers.frontend as users
 
 app = FastAPI(redoc_url=None)

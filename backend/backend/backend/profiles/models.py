@@ -24,7 +24,7 @@ class ProfileAccessType(enum.Enum):
 
 class ProfileAccessBase(SQLModel):
     profile_id: int = Field(foreign_key="profiledb.id", primary_key=True)
-    user_id: int = Field(foreign_key="profiledb.id", primary_key=True)
+    user_id: int = Field(foreign_key="userdb.id", primary_key=True)
     access: ProfileAccessType = Field(
         sa_column=Column(Enum(ProfileAccessType), nullable=False)
     )
