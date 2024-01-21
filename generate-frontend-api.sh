@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+export PATH="/usr/lib/jvm/java-21-openjdk/bin/:$PATH"
+
 mkdir --parents tmp/ backend/static/ && \
 cd backend/ && \
 PYTHONPATH=backend/ python -m backend > ../tmp/openapi.json && \
