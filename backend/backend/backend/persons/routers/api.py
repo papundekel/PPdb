@@ -32,7 +32,7 @@ async def create(
     session: Annotated[AsyncSession, Depends(get_session)],
     person: PersonCreate,
 ):
-    person_db = PersonDB.from_orm(person)
+    person_db = PersonDB.model_validate(person)
 
     return await add_commit_refresh(session, person_db)
 

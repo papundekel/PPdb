@@ -1,7 +1,9 @@
-import enum
+from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Column, Enum, Field, Relationship, SQLModel
+from sqlmodel import Column
+from sqlmodel import Enum as SQLEnum
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from backend.users.models import UserDB
@@ -16,7 +18,7 @@ class ProfileDB(ProfileBase, table=True):
     accesses: list["ProfileAccessDB"] = Relationship(back_populates="profile")
 
 
-class ProfileAccessType(enum.Enum):
+class ProfileAccessType(Enum):
     read = "R"
     write = "W"
     own = "O"
@@ -26,7 +28,7 @@ class ProfileAccessBase(SQLModel):
     profile_id: int = Field(foreign_key="profiledb.id", primary_key=True)
     user_id: int = Field(foreign_key="userdb.id", primary_key=True)
     access: ProfileAccessType = Field(
-        sa_column=Column(Enum(ProfileAccessType), nullable=False)
+        sa_column=Column(SQLEnum(ProfileAccessType), nullable=False)
     )
 
 

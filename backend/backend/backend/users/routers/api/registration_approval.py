@@ -39,7 +39,7 @@ async def create(
     if approval_db is not None:
         return approval_db
 
-    approval_db = RegistrationApprovalDB.from_orm(approval)
+    approval_db = RegistrationApprovalDB.model_validate(approval)
 
     return await add_commit_refresh(session, approval_db)
 

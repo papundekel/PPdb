@@ -1,23 +1,23 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import AutoString, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from backend.profiles.models import ProfileAccessDB
 
 
 class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True)
+    email: EmailStr = Field(unique=True, sa_type=AutoString)
 
 
 class UserDB(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
 
-    tokens: List["TokenDB"] = Relationship(back_populates="user")
-    profile_accesses: List["ProfileAccessDB"] = Relationship(back_populates="user")
+    tokens: list["TokenDB"] = Relationship(back_populates="user")
+    profile_accesses: list["ProfileAccessDB"] = Relationship(back_populates="user")
 
 
 class TokenBase(SQLModel):
@@ -36,7 +36,7 @@ class AccessToken(SQLModel):
 
 
 class RegistrationApproval(SQLModel):
-    email: EmailStr = Field(primary_key=True)
+    email: EmailStr = Field(primary_key=True, sa_type=AutoString)
 
 
 class RegistrationApprovalDB(RegistrationApproval, table=True):

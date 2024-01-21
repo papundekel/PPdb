@@ -124,8 +124,8 @@ async def create(
             status_code=HTTP_403_FORBIDDEN, detail="User registration not approved."
         )
 
-    user_db = UserDB.from_orm(
-        user, {"hashed_password": pwd_context.hash(user.password)}
+    user_db = UserDB.model_validate(
+        user, update={"hashed_password": pwd_context.hash(user.password)}
     )
 
     await session.delete(approval_db)
